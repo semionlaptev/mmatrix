@@ -1,22 +1,36 @@
 #include <iostream>
+#include <time.h>
+#include <math.h>
+
 #include "windows.h"
 #include "mmatrix.h"
+//#include "test.h"
 
 using namespace std;
 
+#define PI (3.141592653589793f)
+#define ANGLE PI
+
 int main()
 {
-	const float initmatrix[] = {
-		1, 2, 3,
-		4, 5, 6,
-		7, 8, 9
+
+    const float yvector[] = {0,1,0};
+
+	//rotate around x axis
+	const float xrotmatrix[] = {
+		1,		0,			0,
+		0, cos(ANGLE), -sin(ANGLE),
+		0, sin(ANGLE), cos(ANGLE)
 	};
-	;
-	const float xvector[] = {1,0,0};
 
-	MMatrix<float,1,3> vector1(xvector);
+	Vector3f vector1(yvector);
+	Matrix3f rotmatrix(xrotmatrix);
 
-	vector1.output();
+	//vector1.output();
+	
+	cout<<*((vector1[0])+1);
+	vector1 = vector1*rotmatrix;
+	//vector1.output();
 
 	system("pause");
 
