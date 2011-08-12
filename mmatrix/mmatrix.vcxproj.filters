@@ -32,13 +32,13 @@
     <ClInclude Include="mmatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_numerical.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="matrix_rotation_matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix_3dvector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

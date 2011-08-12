@@ -4,6 +4,8 @@
 
 #include "windows.h"
 #include "mmatrix.h"
+#include "matrix_3dvector.h"
+#include "matrix_rotation_matrix.h"
 //#include "test.h"
 
 using namespace std;
@@ -13,24 +15,28 @@ using namespace std;
 
 int main()
 {
+	//Vector3f vect1(1,2,3);
 
-    const float yvector[] = {0,1,0};
-
-	//rotate around x axis
-	const float xrotmatrix[] = {
-		1,		0,			0,
-		0, cos(ANGLE), -sin(ANGLE),
-		0, sin(ANGLE), cos(ANGLE)
+	const float in[] = {
+		1,2,3,
+		4,5,6,
+		7,8,9
 	};
 
-	Vector3f vector1(yvector);
-	Matrix3f rotmatrix(xrotmatrix);
-
-	//vector1.output();
+	RotMatrix3f rot(PI/2,0,0);
 	
-	cout<<*((vector1[0])+1);
-	vector1 = vector1*rotmatrix;
-	//vector1.output();
+	Matrix3f v1(in);
+	Matrix3f v2(in);
+
+	RotMatrix3f rot1(PI/2,0,0);
+
+	v2(8) = 3;
+	v2.output();
+
+	if(v1 == v2)
+		v1.output();
+	else
+		cout<<"not";
 
 	system("pause");
 

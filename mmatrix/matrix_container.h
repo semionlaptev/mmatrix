@@ -1,41 +1,45 @@
 #pragma once
 /*
 	Matrix_container class.
-	This class represents a container that stores a 2d matrix in a linear array.
+		This class represents a container that stores a 2d matrix in a linear array.
 	The template sets the type of the stored data(T) and size of the matrix(R,C).
 
 	Uses some code and approaches from a matrix class by Gaspard Petit http://www-etud.iro.umontreal.ca/~petitg/
 
 	constructors:
 	
-	Matrix_container(void);
-		does nothing. In this case the array contains uninitialized values 
-		and can cause troubles if you forget to fill the matrix manualy;
-	Matrix_container(const T(&initarray)[R*C]);
-		copies values from the input constant array into the matrix. The input array must be R*C length.
-	Matrix_container(const Matrix_container &copymatrix);
-		Copy constructor that copies values from the input matrix;
+		Matrix_container(void);
+			does nothing. In this case the array contains uninitialized values 
+			and can cause troubles if you forget to fill the matrix manualy;
+		Matrix_container(const T(&initarray)[R*C]);
+			copies values from the input constant array into the matrix. The input array must be R*C length.
+		Matrix_container(const Matrix_container &copymatrix);
+			Copy constructor that copies values from the input matrix;
 
 	public methods:
 	
-	void output() - prints the matrix to a console;
-	void copy(const T(&initarray)[R*C]) - copies values from 'inarray' to 'matrix'. Input array must be R*C length;
-	void copy(const Matrix_container &inmatrix) - copies the matrix from the input object. 
-		The input matrix must be the same size and have the same internal data type.
+		void output() - prints the matrix to a console;
+		void copy(const T(&initarray)[R*C]) - copies values from 'inarray' to 'matrix'. Input array must be R*C length;
+		void copy(const Matrix_container &inmatrix) - copies the matrix from the input object. 
+			The input matrix must be the same size and have the same internal data type.
 	
 	overloaded operators:
 	
-	operator=
-		overloads assignment operator that copies a matrix from the right object to the left. 
-		Returns a reference to itself object, so you can use it as a = b = c;
-	operator()
-		usage: m(r,c). accesses an matrix element in r'th row and c'th columns. 
-			Returns a reference to this element, so you can change its value;
-	operator[]
-		usage: m[r][c] - the same functionality, but try to avoid using this, 
-		because it doesn't check r and c parametres. 
-		Overloaded operator [] returns a pointer to the first element from r'th row so 
-		m[r][c] works as *((m[r])+c);
+		operator=
+			overloads assignment operator that copies a matrix from the right object to the left. 
+			Returns a reference to itself object, so you can use it as a = b = c;
+		operator(int)
+			...
+		operator(int,int)
+			usage: m(r,c). accesses an matrix element in r'th row and c'th columns. 
+				Returns a reference to this element, so you can change its value;
+
+		--deleted--
+		//operator[]
+		//	usage: m[r][c] - the same functionality, but try to avoid using this, 
+		//	because it doesn't check r and c parametres. 
+		//	Overloaded operator [] returns a pointer to the first element from r'th row so 
+		//	m[r][c] works as *((m[r])+c);
 */
 
 #include <iostream>
@@ -46,7 +50,7 @@ template<class T, int R, int C> class Matrix_container
 private:
 	
 	T matrix[R*C];
-	int length();
+	unsigned int length() const;
 
 public:
 	
@@ -66,11 +70,15 @@ public:
 
 	//overloaded operators
 	Matrix_container &operator=(const Matrix_container &obj);
+
 	T& operator()(unsigned int rowindex, unsigned int colindex);	//for changing internal matrix
 	const T& operator()(unsigned int rowindex, unsigned int colindex) const;
+	T& operator()(unsigned int index);	//for changing internal matrix
+	const T& operator()(unsigned int index) const;
 
 	T* operator[](unsigned int index);	//for changing internal matrix
 	const T* operator[](unsigned int index) const;
+
 };
 
 template<class T, int R, int C> 
@@ -92,7 +100,7 @@ Matrix_container<T,R,C>::Matrix_container(const Matrix_container<T,R,C> &obj)
 }
 
 template<class T, int R, int C> 
-int Matrix_container<T,R,C>::length()
+unsigned int Matrix_container<T,R,C>::length() const
 {
 	return R*C;
 }
@@ -144,7 +152,23 @@ const T& Matrix_container<T,R,C>::operator()(unsigned int rowindex, unsigned int
 	return matrix[colindex+rowindex*R];
 }
 
+//
 template<class T, int R, int C> 
+T& Matrix_container<T,R,C>::operator()(unsigned int index)
+{
+	assert(index>=0 && index < length());
+	return matrix[index];
+}
+
+template<class T, int R, int C>
+const T& Matrix_container<T,R,C>::operator()(unsigned int index) const
+{
+	assert(index>=0 && index < length());
+	return matrix[index];
+}
+//
+
+/*template<class T, int R, int C> 
 T* Matrix_container<T,R,C>::operator[](unsigned int index)
 {
 	//impossible to check ranges in this implementation
@@ -156,4 +180,4 @@ const T* Matrix_container<T,R,C>::operator[](unsigned int index) const
 {
 	//impossible to check ranges in this implementation
 	return &matrix[index*C];
-}
+}*/

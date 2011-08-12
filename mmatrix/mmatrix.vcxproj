@@ -70,8 +70,8 @@
     <ClCompile Include="matrix_numerical.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="matrix_numerical.h" />
     <ClInclude Include="matrix_rotation_matrix.h" />
+    <ClInclude Include="matrix_3dvector.h" />
     <ClInclude Include="mmatrix.h" />
     <ClInclude Include="matrix_container.h" />
     <ClInclude Include="test.h" />
