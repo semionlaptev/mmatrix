@@ -37,8 +37,12 @@
 		operator*(const MMatrix<T,C,RC> &inmatrix)
 			performs multiplication between two matricies. Retruns result in a new object
 			L = A*B; matrix A (R,C), matrix B (C, RC); output matrix L (R, RC)
-		Also added: operator-,operator-=,operator+,operator+=,operator==
+		operator-(), operator-= 
+		operator+,operator+=
+			Arithmetic operators for Matrices and numerical (scalar) values	
+		operator==
 
+		
 	typedefs:
 
 		Matrix2f - (2x2) float matrix
@@ -54,6 +58,7 @@
 #include <iostream>
 #include "matrix_container.h"
 
+
 template<class T, int R, int C>	//n rows, m columns
 class MMatrix : public Matrix_container<T,R,C>
 {
@@ -62,9 +67,22 @@ private:
 
 public:
 
-	MMatrix(void){ loadZero(); }
-	MMatrix(const T(&initarray)[R*C]): Matrix_container<T,R,C>(initarray){};
-	MMatrix(const MMatrix &initmatrix): Matrix_container<T,R,C>(initmatrix){};
+	MMatrix(void){ 
+		#ifdef _DEBUG_
+			cout<<"MMatrix default constructor called. Filling with zero metrix."<<endl;
+		#endif
+		loadZero();
+	}
+	MMatrix(const T(&initarray)[R*C]): Matrix_container<T,R,C>(initarray){
+		#ifdef _DEBUG_
+			cout<<"MMatrix array constrctor called. Proxying to the Base class array constr."<<endl;
+		#endif
+	};
+	MMatrix(const MMatrix &initmatrix): Matrix_container<T,R,C>(initmatrix){
+		#ifdef _DEBUG_
+			cout<<"MMatrix copy constrctor called. Proxying to the Base class copy constr."<<endl;
+		#endif
+	};
 
 	void loadZero();
 	void loadZero(const T &defval);
@@ -79,49 +97,137 @@ public:
 
 	//overloaded operators
 	
-	//can be used with a mtrix of any other data type
+	//can be used with a matrix of any other data type that has arithmetical operations
+	
+	template<class U>
+	MMatrix& operator=(const Matrix_container<U,R,C> &inmatrix);
+
+	bool operator==(const MMatrix<T,R,C> &inmatrix) const;
+	
 	template <class U, int UC>
 	MMatrix<T,R,UC> operator*(const MMatrix<U, C, UC> &inmatrix);
+
 	template <class U, int UC>
 	void operator*=(const MMatrix<U, C, UC> &inmatrix);
+		
+	// multiplicaton by a scalar
 
+	MMatrix<T,R,C> operator*(const T &inscalar);
+	void operator*=(const T &inscalar);
+
+	//a matrix plus a matrix
 	template <class U>
 	MMatrix<T,R,C> operator+(const MMatrix<U,R,C> &inmatrix);
 	template <class U>
 	void operator+=(const MMatrix<U,R,C> &inmatrix);
 
+	//a matrix minus a matrix
 	template <class U>
 	MMatrix<T,R,C> operator-(const MMatrix<U,R,C> &inmatrix);
 	template <class U>
 	void operator-=(const MMatrix<U,R,C> &inmatrix);
 
-	bool operator==(const MMatrix<T,R,C> &inmatrix);
+	//a matrix plus a scalar
+	MMatrix<T,R,C> operator+(const T &inscalar);
+	void operator+=(const T &inscalar);
+
+	//a matrix minus a scalar
+	MMatrix<T,R,C> operator-(const T &inscalar);
+	void operator-=(const T &inscalar);
+
 };
 
-//overload type
+template <class T, int R, int C> template <class U>
+MMatrix<T,R,C>& MMatrix<T,R,C>::operator=(const Matrix_container<U,R,C> &inmatrix)
+{
+	#ifdef _DEBUG_
+		cout<<"MMatrix: template assignment operator=(Matrix_container<U,R,C>) called."<<endl<<"Proxying to Matrix_container::operator=() "<<endl;
+	#endif
+
+	Matrix_container::operator=(inmatrix);
+	return *this;
+}
+
+//multiplication by a matrix
 template <class T, int R, int C> template <class U, int UC>
 MMatrix<T,R,UC> MMatrix<T,R,C>::operator* (const MMatrix<U,C,UC> &inmatrix)
 {
-	MMatrix<T,R,UC> multmatrix; //init a matrix
+	MMatrix<T,R,UC> multmatrix; //init the result matrix
 	multmatrix.loadZero();
 
 	//L = A*B; matrix A (R,C), matrix B (C, RC); output matrix L (R, RC)
-	//inmatrix.output();
 
 	for (int r=0; r<C; r++)
 		for (int i=0; i<R; i++) 
 			for(int j=0; j<UC; j++)
-				multmatrix(i,j) += (*this)(i,r)*inmatrix(r,j);
+				multmatrix(i,j) += (*this)(i,r)*(T)inmatrix(r,j);
 
 	return multmatrix;
 }
-
 template <class T, int R, int C> template <class U, int UC>
 void MMatrix<T,R,C>::operator*= (const MMatrix<U,C,UC> &inmatrix)
 {
 	(*this) = (*this)*inmatrix;
 }
 
+//multiplication by a scalar
+template <class T, int R, int C> 
+MMatrix<T,R,C> MMatrix<T,R,C>::operator* (const T &inscalar)
+{
+	MMatrix<T,R,C> multmatrix; //init the result matrix
+	multmatrix.loadZero();
+
+	for (int i=0; i<R; i++) 
+		for(int j=0; j<C; j++)
+			multmatrix(i,j) = (*this)(i,j)*(T)inscalar;
+
+	return multmatrix;
+}
+template <class T, int R, int C> 
+void MMatrix<T,R,C>::operator*=(const T &inscalar)
+{
+	(*this) = (*this)*inscalar;
+}
+
+//a matrix plus a scalar
+template <class T, int R, int C>
+MMatrix<T,R,C> MMatrix<T,R,C>::operator+ (const T &inscalar)
+{
+	MMatrix<T,R,C> multmatrix; //init the result matrix
+	multmatrix.loadZero();
+
+	for (int i=0; i<R; i++) 
+		for(int j=0; j<C; j++)
+			multmatrix(i,j) = (*this)(i,j)+(T)inscalar;
+
+	return multmatrix;
+}
+template <class T, int R, int C>
+void MMatrix<T,R,C>::operator+=(const T &inscalar)
+{
+	(*this) = (*this)+inscalar;
+}
+
+//a matrix minus a scalar
+template <class T, int R, int C>
+MMatrix<T,R,C> MMatrix<T,R,C>::operator- (const T &inscalar)
+{
+	MMatrix<T,R,C> multmatrix; //init the result matrix
+	multmatrix.loadZero();
+
+	for (int i=0; i<R; i++) 
+		for(int j=0; j<C; j++)
+			multmatrix(i,j) = (*this)(i,j)-(T)inscalar;
+
+	return multmatrix;
+}
+template <class T, int R, int C>
+void MMatrix<T,R,C>::operator-=(const T &inscalar)
+{
+	(*this) = (*this)-inscalar;
+}
+
+//operations between matrices
 template<class T, int R, int C> template <class U>
 MMatrix<T,R,C> MMatrix<T,R,C>::operator+(const MMatrix<U,R,C> &inmatrix)
 {
@@ -129,10 +235,9 @@ MMatrix<T,R,C> MMatrix<T,R,C>::operator+(const MMatrix<U,R,C> &inmatrix)
 
 	for(int i=0;i<R;i++)
 		for(int j=0;j<C;j++)
-			outmatrix(i,j) = (*this)(i,j)+inmatrix(i,j);
+			outmatrix(i,j) = (*this)(i,j)+(T)inmatrix(i,j);
 	return outmatrix;
 }
-
 template<class T, int R, int C> template <class U>
 MMatrix<T,R,C> MMatrix<T,R,C>::operator-(const MMatrix<U,R,C> &inmatrix)
 {
@@ -140,10 +245,9 @@ MMatrix<T,R,C> MMatrix<T,R,C>::operator-(const MMatrix<U,R,C> &inmatrix)
 
 	for(int i=0;i<R;i++)
 		for(int j=0;j<C;j++)
-			outmatrix(i,j) = (*this)(i,j)-inmatrix(i,j);
+			outmatrix(i,j) = (*this)(i,j)-(T)inmatrix(i,j);
 	return outmatrix;
 }
-
 template<class T, int R, int C> template <class U>
 void MMatrix<T,R,C>::operator+=(const MMatrix<U,R,C> &inmatrix)
 {
@@ -154,9 +258,9 @@ void MMatrix<T,R,C>::operator-=(const MMatrix<U,R,C> &inmatrix)
 {
 	(*this) = (*this) - inmatrix; //beter go another way but im to lazy for it
 }
-
+//equality operator
 template<class T, int R, int C>
-bool MMatrix<T,R,C>::operator==(const MMatrix<T,R,C> &inmatrix)
+bool MMatrix<T,R,C>::operator==(const MMatrix<T,R,C> &inmatrix) const
 {
 	bool identical = true;
 	for(int i=0;i<R;i++)
@@ -169,7 +273,7 @@ bool MMatrix<T,R,C>::operator==(const MMatrix<T,R,C> &inmatrix)
 	return identical;
 }
 
-
+//load some of the default matrices
 template<class T, int R, int C>
 void MMatrix<T,R,C>::loadZero(const T& defval)
 {
@@ -177,13 +281,11 @@ void MMatrix<T,R,C>::loadZero(const T& defval)
 		for(int j=0;j<C;j++)
 			(*this)(i,j) = defval;
 }
-
 template<class T, int R, int C>
 void MMatrix<T,R,C>::loadZero()
 {
 	loadZero(0);
 }
-
 template<class T, int R, int C>
 void MMatrix<T,R,C>::loadIdentity(const T &oneval, const T &zeroval)
 {
@@ -195,14 +297,12 @@ void MMatrix<T,R,C>::loadIdentity(const T &oneval, const T &zeroval)
 			else
 				(*this)(i,j) = zeroval;
 }
-
 template<class T, int R, int C>
 void MMatrix<T,R,C>::loadIdentity()
 {
 	assert(R==C);
 	loadIdentity(1,0);
 }
-
 template<class T, int R, int C>
 const MMatrix<T,R,C>& MMatrix<T,R,C>::identity()
 {
@@ -216,7 +316,6 @@ const MMatrix<T,R,C>& MMatrix<T,R,C>::identity()
 	}
 	return _ident;
 }
-
 template<class T, int R, int C>
 const MMatrix<T,R,C>& MMatrix<T,R,C>::zero()
 {
@@ -231,34 +330,21 @@ const MMatrix<T,R,C>& MMatrix<T,R,C>::zero()
 	return _zero;
 }
 
-
-/*template<class T> class MMatrix<T,1,3>
+/*template<class T, int R, int C>
+const MMatrix<float,3,3>& MMatrix<T,R,C>::rotMatrix(float x, float y, float z)
 {
-private:
-
-public:
-	MMatrix(T x, T y, T z);
-};
-
-//template<class T> class MMatrix<T,1,3>;
-template<class T> MMatrix<T,1,3>::MMatrix(const T &x, const T &y, const T &z)
-{
-	const T initarray[] = {x,y,z};
-	copy(initarray);
+	return (*this);
 }*/
 
 //typedefs
 typedef MMatrix<float,1,2> Vector2f;
-//typedef MMatrix<float,1,3> Vector3f;
 typedef MMatrix<float,2,2> Matrix2f;
 typedef MMatrix<float,3,3> Matrix3f;
 
 typedef MMatrix<double,1,2> Vector2d;
-//typedef MMatrix<double,1,3> Vector3d;
 typedef MMatrix<double,2,2> Matrix2d;
 typedef MMatrix<double,3,3> Matrix3d;
 
 typedef MMatrix<int,1,2> Vector2i;
-//typedef MMatrix<int,1,3> Vector3i;
 typedef MMatrix<int,2,2> Matrix2i;
 typedef MMatrix<int,3,3> Matrix3i;

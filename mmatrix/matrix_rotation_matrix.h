@@ -12,6 +12,8 @@
 		template matrix_rotation_matrix<T, 3>
 			matrix_rotation_matrix(T X, T Y, T Z);
 				creates a matrix that will rotate 3d vector by the values of X,Y,Z; 
+			matrix_rotation_matrix(const T(&inarr)[3])
+			The angles are set by the input array
 	methods:
 		template matrix_rotation_matrix<T, 2>
 			setAngle(angle)
@@ -83,6 +85,12 @@ private:
 public:
 
 	matrix_rotation_matrix();
+	//template<class U>
+	matrix_rotation_matrix(const T(&inarr)[3])
+	{
+		setAngle(inarr[0], inarr[1], inarr[2]);	
+	}
+
 	matrix_rotation_matrix(const MMatrix &inparent):MMatrix(inparent){};
 	matrix_rotation_matrix(T X, T Y, T Z);
 	void setAngle(T X, T Y, T Z);

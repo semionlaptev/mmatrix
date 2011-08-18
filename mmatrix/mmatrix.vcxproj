@@ -44,6 +44,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_DEBUG_</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

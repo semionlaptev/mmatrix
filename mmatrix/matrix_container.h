@@ -66,10 +66,15 @@ public:
 
 	void output() const;
 	void copy(const T(&copyarray)[R*C]);
-	void copy(const Matrix_container &obj);
+
+	template <class U>
+	void copy(const Matrix_container<U,R,C> &obj);
 
 	//overloaded operators
+	//assigment
 	Matrix_container &operator=(const Matrix_container &obj);
+	template <class U>
+	Matrix_container &operator=(const Matrix_container<U,R,C> &obj);
 
 	T& operator()(unsigned int rowindex, unsigned int colindex);	//for changing internal matrix
 	const T& operator()(unsigned int rowindex, unsigned int colindex) const;
@@ -84,18 +89,26 @@ public:
 template<class T, int R, int C> 
 Matrix_container<T,R,C>::Matrix_container()
 {
-	//???
+	#ifdef _DEBUG_
+		cout<<"Matrix_container default constructor called"<<endl;
+	#endif
 }
 
 template<class T, int R, int C> 
 Matrix_container<T,R,C>::Matrix_container(const T(&initarray)[R*C])
 {
+	#ifdef _DEBUG_
+		cout<<"Matrix_container array constructor called"<<endl;
+	#endif
 	copy(initarray);
 }
 
 template<class T, int R, int C> 
 Matrix_container<T,R,C>::Matrix_container(const Matrix_container<T,R,C> &obj)
 {
+	#ifdef _DEBUG_
+		cout<<"Matrix_container copy constructor called"<<endl;
+	#endif
 	copy(obj);
 }
 
@@ -124,18 +137,35 @@ void Matrix_container<T,R,C>::copy(const T(&copyarray)[R*C])
 	memcpy(matrix, &copyarray, length()*sizeof(T));
 }
 
-template<class T, int R, int C> 
-void Matrix_container<T,R,C>::copy(const Matrix_container &obj)
+template<class T, int R, int C> template <class U>
+void Matrix_container<T,R,C>::copy(const Matrix_container<U,R,C> &obj)
 {
-	copy(obj.matrix);
+	for(int i=0;i<R;i++)
+		for(int j=0;j<C;j++)
+			(*this)(i,j) = (T)obj(i,j);
 }
 
 template<class T, int R, int C> 
 Matrix_container<T,R,C> &Matrix_container<T,R,C>::operator=(const Matrix_container &obj)
 {
+	#ifdef _DEBUG_
+		cout<<"Matrix_container selftype operator=(Matrix_container) called."<<endl;
+	#endif
+
 	if(this != &obj)
 		copy(obj);
-	return *this;
+	return *this; 
+}
+
+template<class T, int R, int C> template <class U>
+Matrix_container<T,R,C> &Matrix_container<T,R,C>::operator=(const Matrix_container<U, R, C> &obj)
+{
+	#ifdef _DEBUG_
+		cout<<"Matrix_container template operator=(Matrix_container<U,R,C>) called."<<endl;
+	#endif
+
+	copy(obj);
+	return *this; 
 }
 
 template<class T, int R, int C> 
